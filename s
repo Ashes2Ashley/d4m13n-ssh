@@ -73,16 +73,31 @@ if [ ! -f /root/.cloudflared/cert.pem ]; then
 fi
 [ -f /root/.cloudflared/cert.pem ] || die "login did not finish - rerun the command"
 
+get_tid(){
+  local t
+  t=$($CF tunnel list -n "$TNAME" -o json 2>/dev/null | tr -d ' \n' | grep -oE '"id":"[0-9a-f-]{36}"' | head -1 | cut -d'"' -f4)
+  [ -n "$t" ] || t=$($CF tunnel list 2>/dev/null | awk -v n="$TNAME" '$2==n{print $1; exit}' | grep -E '^[0-9a-f-]{36}$')
+  [ -n "$t" ] || t=$($CF tunnel info "$TNAME" 2>/dev/null | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -1)
+  if [ -z "$t" ]; then
+    for f in /root/.cloudflared/*.json "$CFG"/*.json; do
+      [ -f "$f" ] || continue; id=$(basename "$f" .json)
+      $CF tunnel info "$id" 2>/dev/null | grep -qw "$TNAME" && { t=$id; break; }
+    done
+  fi
+  echo "$t"
+}
 say "6/7 named tunnel $TNAME -> $HOSTNAME_SSH"
-TID=$($CF tunnel list -n "$TNAME" -o json 2>/dev/null | grep -oE '"id":"[0-9a-f-]{36}"' | head -1 | cut -d'"' -f4)
+TID=$(get_tid)
 mkdir -p "$CFG"
 if [ -n "$TID" ] && [ ! -f "$CFG/$TID.json" ] && [ ! -f "/root/.cloudflared/$TID.json" ]; then
   say "old tunnel has no credentials here - recreating"
   $CF tunnel cleanup "$TNAME" >/dev/null 2>&1; $CF tunnel delete -f "$TNAME" >/dev/null 2>&1; TID=""
 fi
 if [ -z "$TID" ]; then
-  $CF tunnel create "$TNAME" || die "tunnel create failed"
-  TID=$($CF tunnel list -n "$TNAME" -o json 2>/dev/null | grep -oE '"id":"[0-9a-f-]{36}"' | head -1 | cut -d'"' -f4)
+  OUT=$($CF tunnel create "$TNAME" 2>&1); echo "$OUT"
+  echo "$OUT" | grep -qi "created tunnel" || die "tunnel create failed"
+  TID=$(echo "$OUT" | grep -oE 'with id [0-9a-f-]{36}' | awk '{print $3}')
+  [ -n "$TID" ] || TID=$(get_tid)
 fi
 [ -n "$TID" ] || die "could not read tunnel id"
 [ -f "/root/.cloudflared/$TID.json" ] && cp "/root/.cloudflared/$TID.json" "$CFG/$TID.json"
