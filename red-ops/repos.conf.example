@@ -1,0 +1,13 @@
+# Kodak Red Ops repo registry  —  tag|owner/repo|local_path|tags/description
+# Edit freely. No secrets. `krepos` lists, `kclone <tag>` clones into ~/src.
+play|Ashes2Ashley/kodak-play|/opt/kodak-play|site,prod
+bot|Ashes2Ashley/kodak-discord-bot|/opt/kodak-discord-bot|bot,prod
+hq|Ashes2Ashley/kodakhq|~/kodakhq|hq,pm,cf
+gp|Ashes2Ashley/kodakgp|~/kodakgp|site,cf,marketplace
+ssh|Ashes2Ashley/d4m13n-ssh|~/d4m13n-ssh|infra,tunnel
+intel|Ashes2Ashley/redops-intel|~/redops-intel|ops,cf,dashboard
+redops|Ashes2Ashley/redops-framework|~/src/redops-framework|ops,recon,python
+osint|Ashes2Ashley/agency-osint-dashboard|~/agency-osint-dashboard|ops,cf,dashboard
+assess|Ashes2Ashley/authorized-assessment-gui|~/src/authorized-assessment-gui|ops,governance
+originip|Ashes2Ashley/originiphunter|~/src/originiphunter|ops,infra,go
+freebands|Ashes2Ashley/freebands|~/freebands|cf,marketplace
