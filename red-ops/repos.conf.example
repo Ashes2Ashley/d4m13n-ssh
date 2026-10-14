@@ -1,5 +1,7 @@
 # Kodak Red Ops repo registry  —  tag|owner/repo|local_path|tags/description
-# Edit freely. No secrets. `krepos` lists, `kclone <tag>` clones into ~/src.
+# Edit freely. No secrets.
+# kclone <tag> | kclone <https://github.com/owner/repo[.git]> | kclone owner/repo
+# New HTTPS/owner/repo clones auto-register here (tag = repo name, or owner-repo on collision).
 play|Ashes2Ashley/kodak-play|/opt/kodak-play|site,prod
 bot|Ashes2Ashley/kodak-discord-bot|/opt/kodak-discord-bot|bot,prod
 hq|Ashes2Ashley/kodakhq|~/kodakhq|hq,pm,cf
